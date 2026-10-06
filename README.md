@@ -10,13 +10,18 @@ verdict: benign, suspicious, or phishing.
 
 ## Usage
 
+The code is a package under `src/heron/`. From the repository root:
+
 ```bash
-python triage.py data/samples
+PYTHONPATH=src python -m heron data/samples
 ```
 
-Results are printed to stdout and written to `results.txt`.
+It prints each verdict with the findings behind it, then a summary. The path
+can also be one `.eml` file; `--json` gives machine-readable output, `--help`
+lists the options.
 
 ## Status
 
-Legacy research code, currently being industrialized. Known issues are
-tracked in the issue tracker.
+Modular code: a package under `src/heron/` with one module per
+responsibility (models, parser, features, scorer, cli). Not packaged yet:
+there is no `pyproject.toml` and nothing to install.
