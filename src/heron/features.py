@@ -14,8 +14,19 @@ W_REPLY_TO_MISMATCH = 2
 
 BRANDS = ["paypal", "microsoft", "amazon"]
 
-KEYWORDS = ["urgent", "verify", "suspended", "password", "expires", "act now",
-            "congratulations", "winner", "claim", "immediately", "gift card"]
+KEYWORDS = [
+    "urgent",
+    "verify",
+    "suspended",
+    "password",
+    "expires",
+    "act now",
+    "congratulations",
+    "winner",
+    "claim",
+    "immediately",
+    "gift card",
+]
 
 _IP_URL_RE = re.compile("https?://[0-9]+\\.[0-9]+\\.[0-9]+\\.[0-9]+")
 
@@ -50,14 +61,14 @@ def check_brand(email: ParsedEmail) -> list[Finding]:
 
 
 def check_auth(email: ParsedEmail) -> list[Finding]:
-    """A finding when SPF or DMARC failed."""
+    """Return a finding when SPF or DMARC failed."""
     if "spf=fail" in email.auth_results or "dmarc=fail" in email.auth_results:
         return [Finding("auth_fail", "SPF or DMARC failed", W_AUTH_FAIL)]
     return []
 
 
 def check_reply_to(email: ParsedEmail) -> list[Finding]:
-    """A finding when replies go to a different domain than the sender's."""
+    """Return a finding when replies go to a different domain than the sender's."""
     sender, reply = email.from_domain, email.reply_to_domain
     if sender and reply and sender != reply:
         return [Finding("reply_to_mismatch", f"replies go to {reply}", W_REPLY_TO_MISMATCH)]

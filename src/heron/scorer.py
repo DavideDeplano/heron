@@ -8,7 +8,18 @@ SUSPICIOUS_THRESHOLD = 3
 
 
 def triage(email: ParsedEmail) -> TriageResult:
-    """Run every check on one message and decide its verdict."""
+    """Run every check on one message and decide its verdict.
+
+    Parameters
+    ----------
+    email : ParsedEmail
+        The message, as returned by ``parse_eml``.
+
+    Returns
+    -------
+    TriageResult
+        The score, the verdict and the findings that explain them.
+    """
     findings: list[Finding] = []
     for check in ALL_CHECKS:
         findings.extend(check(email))

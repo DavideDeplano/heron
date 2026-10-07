@@ -10,10 +10,11 @@ verdict: benign, suspicious, or phishing.
 
 ## Usage
 
-The code is a package under `src/heron/`. From the repository root:
+Install heron and the dev tools with uv, then run it from the repository root:
 
 ```bash
-PYTHONPATH=src python -m heron data/samples
+uv sync                       # create .venv from uv.lock (heron + dev tools)
+uv run heron data/samples
 ```
 
 It prints each verdict with the findings behind it, then a summary. The path
@@ -22,6 +23,7 @@ lists the options.
 
 ## Status
 
-Modular code: a package under `src/heron/` with one module per
-responsibility (models, parser, features, scorer, cli). Not packaged yet:
-there is no `pyproject.toml` and nothing to install.
+Packaged (`pyproject.toml`, src layout, committed `uv.lock`), formatted and
+linted (ruff), typed (mypy strict), with a pre-commit hook and an API
+reference built from the docstrings by Sphinx
+(`uv run sphinx-build -W docs docs/_build`).

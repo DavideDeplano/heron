@@ -18,7 +18,20 @@ def _domain(header_value: str) -> str | None:
 
 
 def parse_eml(raw: str, email_id: str) -> ParsedEmail:
-    """Read one raw message once and keep only what the checks need."""
+    """Read one raw message once and keep only what the checks need.
+
+    Parameters
+    ----------
+    raw : str
+        The whole message, headers and body, as read from an ``.eml`` file.
+    email_id : str
+        The name of the message in the results, such as its file name.
+
+    Returns
+    -------
+    ParsedEmail
+        The parts of the message that the indicator checks read.
+    """
     msg = message_from_string(raw, policy=policy.default)
     sender = str(msg.get("From", ""))
     return ParsedEmail(

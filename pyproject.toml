@@ -1,0 +1,37 @@
+[project]
+name = "heron"
+version = "0.3.0"
+description = "Phishing email triage: parse .eml files, extract indicators, produce a verdict"
+readme = "README.md"
+requires-python = ">=3.12"
+license = "MIT"  # SPDX expression (PEP 639)
+dependencies = []  # core stays dependency-free; extras: [api], [ai]
+
+[project.scripts]
+heron = "heron.cli:main"
+
+[dependency-groups]  # developer tools: never published; `uv sync` installs them
+dev = [
+  "ruff", "mypy", "pre-commit", "sphinx", "sphinx-rtd-theme",
+]
+
+[build-system]
+requires = ["hatchling>=1.27"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/heron"]
+
+[tool.ruff]
+line-length = 100
+src = ["src"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "SIM", "C4", "S"]  # S = security rules (bandit)
+
+[tool.ruff.lint.per-file-ignores]
+"tests/*" = ["E501", "S101"]  # pytest uses plain assert
+
+[tool.mypy]
+strict = true
+files = ["src"]
