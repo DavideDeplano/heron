@@ -1,0 +1,26 @@
+name: CI
+
+on:
+  push:
+    branches: ["lab-*"]  # the lab branches of your fork
+  pull_request:
+
+# least privilege by default; a job that needs more asks for it explicitly
+permissions:
+  contents: read
+
+jobs:
+  quality:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: astral-sh/setup-uv@v9.0.0
+        with:
+          python-version: "3.12"
+      - run: uv sync --locked
+      - name: Lint
+        run: uv run ruff check . && uv run ruff format --check .
+      - name: Type-check
+        run: uv run mypy src
+      - name: Docs (any Sphinx warning is an error)
+        run: uv run sphinx-build -W docs docs/_build
