@@ -1,14 +1,7 @@
-from pathlib import Path
-
 import pytest
 from pydantic import ValidationError
 
 from heron.config import Settings
-
-
-@pytest.fixture(autouse=True)
-def no_env_file(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
-    monkeypatch.chdir(tmp_path)
 
 
 def test_defaults_work_without_any_configuration() -> None:
