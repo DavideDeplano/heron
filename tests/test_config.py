@@ -1,6 +1,7 @@
 import pytest
 from pydantic import ValidationError
 
+from heron.cli import main
 from heron.config import Settings
 
 
@@ -28,3 +29,11 @@ def test_a_bad_value_fails_at_startup(monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setenv("HERON_LOG_LEVEL", "LOUD")
     with pytest.raises(ValidationError):
         Settings()
+
+
+def test_cli_rejects_bad_configuration(
+    monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]
+) -> None:
+    monkeypatch.setenv("HERON_LOG_LEVEL", "LOUD")
+    assert main(["."]) == 2
+    assert "invalid configuration" in capsys.readouterr().err
