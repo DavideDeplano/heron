@@ -1,5 +1,6 @@
-# quick phishing checker for the mail export - L. Garcia, march 2025
-# TODO: make this nicer at some point
+import re
+import os
+import sys
 
 # Points added by each indicator, and the score thresholds of each verdict.
 W_KEYWORD = 1
@@ -10,10 +11,6 @@ W_AUTH_FAIL = 2
 W_REPLY_TO_MISMATCH = 2
 PHISHING_THRESHOLD = 5
 SUSPICIOUS_THRESHOLD = 3
-
-import re
-import os
-import sys
 
 BRANDS = ["paypal", "microsoft", "amazon"]
 
@@ -48,7 +45,6 @@ def check_mail(folder, flagged=None):
         s = 0
         
         frm = header(raw, "From")
-        subj = header(raw, "Subject")
 
         low = raw.lower()
         for kw in KEYWORDS:
