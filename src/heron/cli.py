@@ -118,7 +118,7 @@ def report(verdicts):
     print("checked", len(verdicts), "mails")
     for v in verdicts:
         print(" ", v[0], "->", v[1], "(score", str(v[2]) + ")")
-    with open("results.txt", "w") as out:
+    with open("../../results.txt", "w") as out:
         out.write(str(verdicts))
     print("flagged:", [v[0] for v in verdicts if v[1] == "PHISHING"])
 
