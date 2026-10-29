@@ -2,7 +2,7 @@
 
 import re
 
-from heron.parser import sender_domain
+from heron.models import ParsedEmail
 
 
 W_REPLY_TO_MISMATCH = 2
@@ -15,22 +15,19 @@ BRANDS = ["paypal", "microsoft", "amazon"]
 KEYWORDS = ["urgent", "verify", "suspended", "password", "expires", "act now",
             "congratulations", "winner", "claim", "immediately", "gift card"]
 
-_URL_RE = re.compile("https?://[^\\s\"'<>]+")
 _IP_URL_RE = re.compile("https?://[0-9]+\\.[0-9]+\\.[0-9]+\\.[0-9]+")
 
 
-def keyword_score(raw):
+def keyword_score(email: ParsedEmail) -> int:
     """Assign one point for each keyword found in the email."""
-    low = raw.lower()
-    return sum(W_KEYWORD for kw in KEYWORDS if kw in low)
+    return sum(W_KEYWORD for kw in KEYWORDS if kw in email.text)
 
 
-def link_score(raw):
+def link_score(email: ParsedEmail) -> int:
     """Assign points for links to IP addresses or punycode domain."""
     # links that look bad
     s = 0
-    urls = re.findall(_URL_RE, raw)
-    for u in urls:
+    for u in email.links:
         if re.match(_IP_URL_RE, u):
             s = s + W_IP_LINK  # ip address url, very bad
         if "xn--" in u:  # punycode
@@ -38,28 +35,27 @@ def link_score(raw):
     return s
 
 
-def brand_score(frm):
+def brand_score(email: ParsedEmail) -> int:
     """Assign points when the sender says paypal/microsoft/amazon but domain
     is weird"""
     s = 0
+    low = email.sender.lower()
     for brand in BRANDS:
-        if brand in frm.lower() and f"{brand}.com" not in frm.lower():
+        if brand in low and f"{brand}.com" not in low:
             s = s + W_BRAND_MISMATCH
     return s
 
 
-def auth_score(raw):
+def auth_score(email: ParsedEmail) -> int:
     """Assign points when SPF or DMARC failed."""
-    low = raw.lower()
-    if "spf=fail" in low or "dmarc=fail" in low:
+    if "spf=fail" in email.auth_results or "dmarc=fail" in email.auth_results:
          return W_AUTH_FAIL
     return 0
 
 
-def reply_to_score(frm, reply_to):
+def reply_to_score(email: ParsedEmail) -> int:
     """Assign points when sender and reply-to fiels mismatch."""
-    from_domain = sender_domain(frm)
-    reply_domain = sender_domain(reply_to)
-    if from_domain and reply_domain and from_domain != reply_domain:
+    if (email.from_domain and email.reply_to_domain
+        and email.from_domain != email.reply_to_domain):
         return W_REPLY_TO_MISMATCH
     return 0
