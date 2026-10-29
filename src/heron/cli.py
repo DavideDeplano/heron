@@ -24,16 +24,10 @@ def check_mail(folder: str) -> list[TriageResult]:
         verdicts.append(result)
     return verdicts
 
-
-def report(verdicts):
-    """Prints the verdicts and save them to the results file."""
-    print("checked", len(verdicts), "mails")
+def report(verdicts: list[TriageResult]) -> None:
+    """Prints the verdicts."""
     for v in verdicts:
-        print(" ", v[0], "->", v[1], "(score", str(v[2]) + ")")
-    with open("../../results.txt", "w") as out:
-        out.write(str(verdicts))
-    print("flagged:", [v[0] for v in verdicts if v[1] == Verdict.PHISHING])
-
+        print(f"{v.email_id:<28} {v.verdict} score={v.score}")
 
 def main(argv: list[str] | None = None):
     """Run the triage on the given folder"""
