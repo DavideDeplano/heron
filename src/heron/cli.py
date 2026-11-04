@@ -12,7 +12,13 @@ from heron.models import TriageResult
 
 
 def build_parser() -> argparse.ArgumentParser:
-    """Return the parser of the CLI arguments."""
+    """Return the parser of the CLI arguments.
+
+    Returns
+    -------
+    argparse.ArgumentParser
+        The parser of the CLI arguments.
+    """
     parser = argparse.ArgumentParser(
         prog="heron",
         description="Triage of phishing emails."
@@ -32,6 +38,16 @@ def build_parser() -> argparse.ArgumentParser:
 def check_mail(folder: str) -> list[TriageResult]:
     """Score every email file in the given folder.
     Return (file name, verdict, score) tuples.
+
+    Parameters
+    ----------
+    folder : str
+        The folder containing the `.eml` files.
+
+    Returns
+    -------
+    list[TriageResult]
+        A list of TriageResult objects containing the email ID, verdict, and score.
     """
     verdicts = []
     files = os.listdir(folder)
@@ -53,7 +69,13 @@ def report(verdicts: list[TriageResult]) -> None:
 
 
 def main(argv: list[str] | None = None):
-    """Run the triage on the given folder"""
+    """Entry point for the CLI.
+
+    Parameters
+    ----------
+    argv: list[str] | None
+        The command-line arguments. If None, sys.argv[1:] is used.
+    """
     parser = build_parser()
     args = parser.parse_args(argv)
     try:

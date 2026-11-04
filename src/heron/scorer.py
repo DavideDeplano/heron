@@ -20,7 +20,18 @@ ALL_CHECKS: tuple[Callable[[ParsedEmail], int], ...] = (
 
 
 def triage(email: ParsedEmail) -> TriageResult:
-    """Run every check on one email and return the outcome."""
+    """Compute the score of the email and return the verdict.
+
+    Parameters
+    ----------
+    email : ParsedEmail
+        The parsed email to be scored.
+
+    Returns
+    -------
+    TriageResult
+        The result of the triage, including the email ID, score, and verdict.
+    """
     score = sum(check(email) for check in ALL_CHECKS)
     return TriageResult(
         email_id=email.email_id,
@@ -30,7 +41,18 @@ def triage(email: ParsedEmail) -> TriageResult:
 
 
 def compute_verdict(score: int) -> Verdict:
-    """Map a score to a verdict."""
+    """Compute the verdict based on the score.
+
+    Parameters
+    ----------
+    score : int
+        The score of the email.
+
+    Returns
+    -------
+    Verdict
+        The verdict of the email based on the score.
+    """
     if score >= PHISHING_THRESHOLD:
         return Verdict.PHISHING
     elif score >= SUSPICIOUS_THRESHOLD:
