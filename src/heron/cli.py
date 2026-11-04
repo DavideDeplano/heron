@@ -19,19 +19,9 @@ def build_parser() -> argparse.ArgumentParser:
     argparse.ArgumentParser
         The parser of the CLI arguments.
     """
-    parser = argparse.ArgumentParser(
-        prog="heron",
-        description="Triage of phishing emails."
-    )
-    parser.add_argument(
-        "folder",
-        help="a folder containing `.eml` files"
-    )
-    parser.add_argument(
-        "--json",
-        action="store_true",
-        help="machine-readable output"
-    )
+    parser = argparse.ArgumentParser(prog="heron", description="Triage of phishing emails.")
+    parser.add_argument("folder", help="a folder containing `.eml` files")
+    parser.add_argument("--json", action="store_true", help="machine-readable output")
     return parser
 
 
@@ -69,11 +59,12 @@ def report(verdicts: list[TriageResult]) -> None:
 
 
 def main(argv: list[str] | None = None):
-    """Entry point for the CLI.
+    """Entry point of the CLI.
 
     Parameters
     ----------
-    argv: list[str] | None
+
+    argv : list[str] | None
         The command-line arguments. If None, sys.argv[1:] is used.
     """
     parser = build_parser()

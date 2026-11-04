@@ -2,8 +2,7 @@
 
 from typing import Callable
 
-from heron.features import (auth_score, brand_score, keyword_score, link_score,
-                            reply_to_score)
+from heron.features import auth_score, brand_score, keyword_score, link_score, reply_to_score
 from heron.models import ParsedEmail, TriageResult, Verdict
 
 
@@ -15,7 +14,7 @@ ALL_CHECKS: tuple[Callable[[ParsedEmail], int], ...] = (
     link_score,
     brand_score,
     auth_score,
-    reply_to_score
+    reply_to_score,
 )
 
 
@@ -33,11 +32,7 @@ def triage(email: ParsedEmail) -> TriageResult:
         The result of the triage, including the email ID, score, and verdict.
     """
     score = sum(check(email) for check in ALL_CHECKS)
-    return TriageResult(
-        email_id=email.email_id,
-        score=score,
-        verdict=compute_verdict(score)
-    )
+    return TriageResult(email_id=email.email_id, score=score, verdict=compute_verdict(score))
 
 
 def compute_verdict(score: int) -> Verdict:

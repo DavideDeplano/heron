@@ -5,6 +5,7 @@ from enum import StrEnum
 @dataclass(frozen=True)
 class ParsedEmail:
     """Dataclass that holds the parsed email attributes."""
+
     email_id: str
     sender: str
     from_domain: str | None
@@ -17,6 +18,7 @@ class ParsedEmail:
 @dataclass(frozen=True)
 class TriageResult:
     """The outcome of one email message, composed of id, score and verdict."""
+
     email_id: str
     score: int
     verdict: "Verdict"
@@ -24,6 +26,7 @@ class TriageResult:
 
 class Verdict(StrEnum):
     """Outcome verdict of the triage."""
+
     BENIGN = "benign"
     SUSPICIOUS = "suspicious"
     PHISHING = "phishing"

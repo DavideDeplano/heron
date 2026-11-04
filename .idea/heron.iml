@@ -9,4 +9,9 @@
     <orderEntry type="jdk" jdkName="WSL (Ubuntu): (/home/davide/tf-gpu/bin/python3)" jdkType="Python SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
   </component>
+  <component name="PyDocumentationSettings">
+    <option name="format" value="NUMPY" />
+  </component>
+  <component name="ReSTService" />
+  <component name="TestRunnerService" />
 </module>

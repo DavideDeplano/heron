@@ -27,7 +27,7 @@ def parse_eml(raw: str, email_id: str) -> ParsedEmail:
         reply_to_domain=reply_domain,
         auth_results=auth_results,
         text=raw.lower(),
-        links=links
+        links=links,
     )
     return parsed_email
 

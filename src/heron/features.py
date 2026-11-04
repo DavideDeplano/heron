@@ -12,8 +12,19 @@ W_PUNYCODE_LINK = 3
 W_IP_LINK = 3
 W_KEYWORD = 1
 BRANDS = ["paypal", "microsoft", "amazon"]
-KEYWORDS = ["urgent", "verify", "suspended", "password", "expires", "act now",
-            "congratulations", "winner", "claim", "immediately", "gift card"]
+KEYWORDS = [
+    "urgent",
+    "verify",
+    "suspended",
+    "password",
+    "expires",
+    "act now",
+    "congratulations",
+    "winner",
+    "claim",
+    "immediately",
+    "gift card",
+]
 
 _IP_URL_RE = re.compile("https?://[0-9]+\\.[0-9]+\\.[0-9]+\\.[0-9]+")
 
@@ -49,13 +60,12 @@ def brand_score(email: ParsedEmail) -> int:
 def auth_score(email: ParsedEmail) -> int:
     """Assign points when SPF or DMARC failed."""
     if "spf=fail" in email.auth_results or "dmarc=fail" in email.auth_results:
-         return W_AUTH_FAIL
+        return W_AUTH_FAIL
     return 0
 
 
 def reply_to_score(email: ParsedEmail) -> int:
     """Assign points when sender and reply-to fiels mismatch."""
-    if (email.from_domain and email.reply_to_domain
-        and email.from_domain != email.reply_to_domain):
+    if email.from_domain and email.reply_to_domain and email.from_domain != email.reply_to_domain:
         return W_REPLY_TO_MISMATCH
     return 0
