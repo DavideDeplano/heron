@@ -5,6 +5,7 @@ from tests.helpers import make_email
 def test_suspicious_threshold_is_inclusive() -> None:
     assert verdict_for(SUSPICIOUS_THRESHOLD) == Verdict.SUSPICIOUS
     assert verdict_for(SUSPICIOUS_THRESHOLD - 1) == Verdict.BENIGN
+
 def test_phishing_threshold_is_inclusive() -> None:
     assert verdict_for(PHISHING_THRESHOLD) == Verdict.PHISHING
     assert verdict_for(PHISHING_THRESHOLD - 1) == Verdict.SUSPICIOUS
