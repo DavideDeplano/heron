@@ -1,4 +1,4 @@
-from heron.models import Verdict
+from heron.models import ParsedEmail, Verdict
 from heron.scorer import PHISHING_THRESHOLD, SUSPICIOUS_THRESHOLD, triage, verdict_for
 from tests.helpers import make_email
 
@@ -15,3 +15,9 @@ def test_a_harmless_message_scores_zero() -> None:
     assert result.score == 0
     assert result.verdict == Verdict.BENIGN
     assert result.findings == ()
+
+def test_fixtures_are_injected_by_name(
+    benign_email: ParsedEmail, phishing_email: ParsedEmail
+) -> None:
+    assert triage(benign_email).verdict == Verdict.BENIGN
+    assert triage(phishing_email).verdict == Verdict.PHISHING
