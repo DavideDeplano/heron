@@ -2,6 +2,7 @@
 
 import re
 from collections.abc import Callable
+from urllib.parse import urlsplit
 
 from rapidfuzz.distance import Levenshtein
 
@@ -97,6 +98,15 @@ def check_lookalike_sender(email: ParsedEmail) -> list[Finding]:
     ]
 
 
+def check_executable_link(email: ParsedEmail) -> list[Finding]:
+    """One finding for each link to a file that runs when it is opened."""
+    findings = []
+    for url in email.links:
+        if urlsplit(url).path.lower().endswith(EXECUTABLE_EXTENSIONS):
+            findings.append(Finding("executable_link", url, W_EXECUTABLE_LINK))
+    return findings
+
+
 ALL_CHECKS: tuple[Callable[[ParsedEmail], list[Finding]], ...] = (
     check_urgency,
     check_links,
@@ -104,4 +114,5 @@ ALL_CHECKS: tuple[Callable[[ParsedEmail], list[Finding]], ...] = (
     check_auth,
     check_reply_to,
     check_lookalike_sender,
+    check_executable_link,
 )
