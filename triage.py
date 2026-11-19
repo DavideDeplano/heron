@@ -16,29 +16,34 @@ W_REPLY_TO_MISMATCH = 2
 PHISHING_THRESHOLD = 5
 SUSPICIOUS_THRESHOLD = 3
 
+def header(raw, name):
+    """Return the value of the first "name:" header line, or "?" if there is none."""
+    match = re.search(name + ": (.*)", raw)
+    if match is None:
+        return "?"
+    return match.group(1)
+
+def sender_domain(address):
+    """Return the domain of an email address, or None if there is no @."""
+    match = re.search("@([a-zA-Z0-9.-]+)", address)
+    if match is None:
+        return None
+    return match.group(1)
+
 def check_mail(folder, flagged=None):
     if flagged is None:
         flagged = []
-
     scores = {}
     verdicts = []
-
     files = os.listdir(folder)
     for fn in files:
         if not fn.endswith(".eml"):
             continue
         with open(os.path.join(folder, fn), encoding="utf-8", errors="ignore") as f:
             raw = f.read()
-
         s = 0
-        try:
-            frm = re.search("From: (.*)", raw).group(1)
-        except:
-            frm = "?"
-        try:
-            subj = re.search("Subject: (.*)", raw).group(1)
-        except:
-            subj = "?"
+        frm = header(raw, "From")
+        subj = header(raw, "Subject")
         low = raw.lower()
         for kw in KEYWORDS:
             if kw in low:
@@ -60,14 +65,10 @@ def check_mail(folder, flagged=None):
         if "spf=fail" in low or "dmarc=fail" in low:
             s = s + W_AUTH_FAIL
         # reply-to different from from
-        try:
-            rt = re.search("Reply-To: (.*)", raw).group(1)
-            m1 = re.search("@([a-zA-Z0-9.-]+)", frm).group(1)
-            m2 = re.search("@([a-zA-Z0-9.-]+)", rt).group(1)
-            if m1 != m2:
-                s = s + W_REPLY_TO_MISMATCH
-        except:
-            pass
+        from_domain = sender_domain(frm)
+        reply_domain = sender_domain(header(raw, "Reply-To"))
+        if from_domain and reply_domain and from_domain != reply_domain:
+            s = s + W_REPLY_TO_MISMATCH
         scores[fn] = s
         if s >= PHISHING_THRESHOLD:
             verdicts.append((fn, "PHISHING", s))
@@ -89,4 +90,8 @@ if __name__ == "__main__":
         print("usage: python triage.py <folder-with-eml-files>", file=sys.stderr)
         sys.exit(2)
     else:
-        check_mail(sys.argv[1])
+        try:
+            check_mail(sys.argv[1])
+        except FileNotFoundError:
+            print("error: no such folder:", sys.argv[1], file=sys.stderr)
+            sys.exit(2)
