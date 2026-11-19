@@ -7,6 +7,8 @@ import sys
 KEYWORDS = ["urgent", "verify", "suspended", "password", "expires", "act now",
             "congratulations", "winner", "claim", "immediately", "gift card"]
 
+BRANDS = ["paypal", "microsoft", "amazon"]
+
 W_KEYWORD = 1
 W_IP_LINK = 3
 W_PUNYCODE_LINK = 3
@@ -56,12 +58,9 @@ def check_mail(folder, flagged=None):
             if "xn--" in u:
                 s = s + W_PUNYCODE_LINK
         # sender says paypal/microsoft/amazon but domain is weird
-        if "paypal" in frm.lower() and "paypal.com" not in frm.lower():
-            s = s + W_BRAND_MISMATCH
-        if "microsoft" in frm.lower() and "microsoft.com" not in frm.lower():
-            s = s + W_BRAND_MISMATCH
-        if "amazon" in frm.lower() and "amazon.com" not in frm.lower():
-            s = s + W_BRAND_MISMATCH
+        for brand in BRANDS:
+            if brand in frm.lower() and brand + ".com" not in frm.lower():
+                s = s + W_BRAND_MISMATCH
         if "spf=fail" in low or "dmarc=fail" in low:
             s = s + W_AUTH_FAIL
         # reply-to different from from
@@ -89,9 +88,8 @@ if __name__ == "__main__":
     if len(sys.argv) != 2:
         print("usage: python triage.py <folder-with-eml-files>", file=sys.stderr)
         sys.exit(2)
-    else:
-        try:
-            check_mail(sys.argv[1])
-        except FileNotFoundError:
-            print("error: no such folder:", sys.argv[1], file=sys.stderr)
-            sys.exit(2)
+    try:
+        check_mail(sys.argv[1])
+    except FileNotFoundError:
+        print("error: no such folder:", sys.argv[1], file=sys.stderr)
+        sys.exit(2)
