@@ -4,9 +4,6 @@ import re
 import os
 import sys
 
-scores = {}
-verdicts = []
-
 KEYWORDS = ["urgent", "verify", "suspended", "password", "expires", "act now",
             "congratulations", "winner", "claim", "immediately", "gift card"]
 
@@ -22,6 +19,9 @@ SUSPICIOUS_THRESHOLD = 3
 def check_mail(folder, flagged=None):
     if flagged is None:
         flagged = []
+
+    scores = {}
+    verdicts = []
 
     files = os.listdir(folder)
     for fn in files:
@@ -81,6 +81,7 @@ def check_mail(folder, flagged=None):
     out.write(str(verdicts))
     out.close()
     print("flagged:", flagged)
+    return verdicts
 
 if __name__ == "__main__":
     if len(sys.argv) != 2:
