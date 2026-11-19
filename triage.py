@@ -30,12 +30,18 @@ def sender_domain(address):
         return None
     return match.group(1)
 
-def check_mail(folder, flagged=None):
-    if flagged is None:
-        flagged = []
+def verdict_for(score):
+    """Map a score to a verdict."""
+    if score >= PHISHING_THRESHOLD:
+        return "PHISHING"
+    if score >= SUSPICIOUS_THRESHOLD:
+        return "suspicious"
+    return "ok"
+
+def check_mail(folder):
+    """Score every .eml file in folder; return (file name, verdict, score) tuples."""
     verdicts = []
-    files = os.listdir(folder)
-    for fn in files:
+    for fn in os.listdir(folder):
         if not fn.endswith(".eml"):
             continue
         with open(os.path.join(folder, fn), encoding="utf-8", errors="ignore") as f:
@@ -64,19 +70,17 @@ def check_mail(folder, flagged=None):
         reply_domain = sender_domain(header(raw, "Reply-To"))
         if from_domain and reply_domain and from_domain != reply_domain:
             s = s + W_REPLY_TO_MISMATCH
-        if s >= PHISHING_THRESHOLD:
-            verdicts.append((fn, "PHISHING", s))
-            flagged.append(fn)
-        elif s >= SUSPICIOUS_THRESHOLD:
-            verdicts.append((fn, "suspicious", s))
-        else:
-            verdicts.append((fn, "ok", s))
+        verdicts.append((fn, verdict_for(s), s))
+    return verdicts
+
+def report(verdicts):
+    """Print the verdicts and save them to results.txt."""
     print("checked", len(verdicts), "mails")
     for v in verdicts:
         print(" ", v[0], "->", v[1], "(score", str(v[2]) + ")")
     with open("results.txt", "w", encoding="utf-8") as out:
         out.write(str(verdicts))
-    print("flagged:", flagged)
+    print("flagged:", [v[0] for v in verdicts if v[1] == "PHISHING"])
     return verdicts
 
 if __name__ == "__main__":
@@ -84,7 +88,7 @@ if __name__ == "__main__":
         print("usage: python triage.py <folder-with-eml-files>", file=sys.stderr)
         sys.exit(2)
     try:
-        check_mail(sys.argv[1])
+        report(check_mail(sys.argv[1]))
     except FileNotFoundError:
         print("error: no such folder:", sys.argv[1], file=sys.stderr)
         sys.exit(2)
