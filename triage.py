@@ -1,6 +1,8 @@
 import re
 import os
 import sys
+from email import message_from_string, policy
+from email.utils import parseaddr
 
 KEYWORDS = ["urgent", "verify", "suspended", "password", "expires", "act now",
             "congratulations", "winner", "claim", "immediately", "gift card"]
@@ -19,19 +21,12 @@ SUSPICIOUS_THRESHOLD = 3
 URL_RE = re.compile("https?://[^\\s\"'<>]+")
 IP_URL_RE = re.compile("https?://[0-9]+\\.[0-9]+\\.[0-9]+\\.[0-9]+")
 
-def header(raw, name):
-    """Return the value of the first "name:" header line, or "?" if there is none."""
-    match = re.search(name + ": (.*)", raw)
-    if match is None:
-        return "?"
-    return match.group(1)
-
-def sender_domain(address):
-    """Return the domain of an email address, or None if there is no @."""
-    match = re.search("@([a-zA-Z0-9.-]+)", address)
-    if match is None:
+def sender_domain(header_value):
+    """Return the domain of the address in a From/Reply-To value, or None."""
+    _, address = parseaddr(header_value)
+    if "@" not in address:
         return None
-    return match.group(1)
+    return address.rsplit("@", 1)[1].lower()
 
 def keyword_score(raw):
     """One point for each pressure keyword found anywhere in the message."""
@@ -71,9 +66,11 @@ def reply_to_score(frm, reply_to):
 
 def score_email(raw):
     """Sum the points of every indicator for one raw message."""
-    frm = header(raw, "From")
+    msg = message_from_string(raw, policy=policy.default)
+    frm = str(msg.get("From", ""))
+    reply_to = str(msg.get("Reply-To", ""))
     return (keyword_score(raw) + link_score(raw) + brand_score(frm)
-            + auth_score(raw) + reply_to_score(frm, header(raw, "Reply-To")))
+            + auth_score(raw) + reply_to_score(frm, reply_to))
 
 def verdict_for(score):
     """Map a score to a verdict."""
